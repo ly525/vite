@@ -1,0 +1,87 @@
+{
+  "$schema": "https://aka.ms/codetour-schema",
+  "title": "debug vite",
+  "steps": [
+    {
+      "file": "packages/vite/bin/vite.js",
+      "description": "qqq",
+      "line": 2
+    },
+    {
+      "file": "packages/vite/src/node/server/index.ts",
+      "description": "// leading slash -> /",
+      "line": 36,
+      "selection": {
+        "start": {
+          "line": 36,
+          "character": 10
+        },
+        "end": {
+          "line": 36,
+          "character": 28
+        }
+      }
+    },
+    {
+      "file": "packages/vite/src/node/server/index.ts",
+      "description": "https://www.cnblogs.com/chris-oil/p/5625437.html",
+      "line": 5,
+      "selection": {
+        "start": {
+          "line": 5,
+          "character": 8
+        },
+        "end": {
+          "line": 5,
+          "character": 15
+        }
+      }
+    },
+    {
+      "file": "packages/vite/src/node/server/index.ts",
+      "description": "https://github.com/nodejs/node/blob/e46c680bf2b211bbd52cf959ca17ee98c7f657f5/lib/internal/net.js#L31",
+      "line": 8
+    },
+    {
+      "file": "packages/vite/src/node/server/index.ts",
+      "description": "https://github.com/nodejs/node/blob/e46c680bf2b211bbd52cf959ca17ee98c7f657f5/lib/internal/net.js#L31",
+      "line": 8
+    },
+    {
+      "file": "packages/vite/bin/vite.js",
+      "description": "不是 node_modules 的目录进行source-map 映射",
+      "line": 4
+    },
+    {
+      "file": "packages/vite/bin/vite.js",
+      "description": "__dirname -> '/Users/lambert/Downloads/vite/packages/vite/bin'",
+      "line": 10,
+      "selection": {
+        "start": {
+          "line": 4,
+          "character": 6
+        },
+        "end": {
+          "line": 4,
+          "character": 15
+        }
+      }
+    },
+    {
+      "file": "packages/vite/bin/vite.js",
+      "description": "检查是否为debug 模式，即 `vite --debug` 或 `vite -d`",
+      "line": 14
+    },
+    {
+      "file": "packages/vite/bin/vite.js",
+      "description": "process.argv: ['/Users/lambert/.nvm/versions/node/v14.18.1/bin/node', '/Users/lambert/Downloads/vite-debug/node_modules/vite/bin/vite.js']\n\n第一行的 #!/usr/bin/env node 相当于：`node node_modules/.bin/vite`\n",
+      "line": 19
+    },
+    {
+      "file": "packages/vite/src/node/cli.ts",
+      "description": "npm run dev -> vite -> vite-root/packages/vite/bin/vite.js -> start() -> require('../dist/node/cli')\n",
+      "line": 10
+    }
+  ],
+  "ref": "master"
+}

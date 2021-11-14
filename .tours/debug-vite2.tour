@@ -1,0 +1,285 @@
+{
+  "$schema": "https://aka.ms/codetour-schema",
+  "title": "debug-vite2",
+  "steps": [
+    {
+      "file": "packages/vite/src/node/cli.ts",
+      "description": "npm run dev -> vite -> vite-root/packages/vite/bin/vite.js -> start() -> require('../dist/node/cli')\n\ncac 一个自定义command的小工具，挺有意思，推荐看看，直接点进 node_modules 中看即可",
+      "line": 10
+    },
+    {
+      "file": "packages/vite/src/node/server/index.ts",
+      "description": "https://cn.vitejs.dev/config/#root",
+      "line": 274
+    },
+    {
+      "file": "packages/vite/src/node/server/index.ts",
+      "description": "https://cn.vitejs.dev/config/#server-options",
+      "line": 275
+    },
+    {
+      "file": "packages/vite/src/node/server/index.ts",
+      "description": "https://cn.vitejs.dev/config/#server-https",
+      "line": 276
+    },
+    {
+      "file": "packages/vite/src/node/server/index.ts",
+      "description": "https://cn.vitejs.dev/config/#server-middlewaremode",
+      "line": 278
+    },
+    {
+      "file": "packages/vite/src/node/server/index.ts",
+      "description": "访问首页（index.html）使用该中间件处理",
+      "line": 492
+    },
+    {
+      "file": "packages/vite/src/node/server/middlewares/indexHtml.ts",
+      "description": "获取该 html 对应的文件路径",
+      "line": 172
+    },
+    {
+      "file": "packages/vite/src/node/server/index.ts",
+      "description": "server.transformIndexHtml 在这里赋值",
+      "line": 378,
+      "selection": {
+        "start": {
+          "line": 378,
+          "character": 3
+        },
+        "end": {
+          "line": 378,
+          "character": 28
+        }
+      }
+    },
+    {
+      "file": "packages/vite/src/node/server/middlewares/indexHtml.ts",
+      "description": "devHtmlHook里使用了magic-string，通过overwrite(start,end,content)这样简易的方法操作ast，start和end为ast某个部分起始结尾坐标，content为要替换的字符串内容。从根结点开始，逐层级遍历。对于非引用别的模块的esmodule script标签，修改其内容为代理模块，比如\n```js\n<script type=\"module\">import log from './src/b.ts';log();</script>\n```\n会被修改为\n```js\n<script type=\"module\" src=\"/index.html?html-proxy&index=1.js\">\n```\n这个代理模块，最后返回了head-prepend这个tag用injectToHead插入html。",
+      "line": 158
+    },
+    {
+      "file": "packages/vite/src/node/server/index.ts",
+      "description": "container是贯穿整个流程的插件系统，\nbuildstart会触发所有插件的buildStart Hook，关于[插件系统](https://awesome-vite-design.vercel.app/guide/pluginContainer.html)我们后面会专项研究，在runOptimize里执行了预构建相关操作。\n",
+      "line": 523,
+      "selection": {
+        "start": {
+          "line": 519,
+          "character": 20
+        },
+        "end": {
+          "line": 519,
+          "character": 37
+        }
+      }
+    },
+    {
+      "file": "packages/vite/src/node/server/index.ts",
+      "description": "服务启动前会进行预构建",
+      "line": 524
+    },
+    {
+      "file": "packages/vite/src/node/server/index.ts",
+      "description": "预构建的函数名是optimizeDeps",
+      "line": 508
+    },
+    {
+      "file": "packages/vite/src/node/optimizer/index.ts",
+      "description": "1. 判断是否需要预构建，如果之前预构建的内容还可以用，那么直接return，反之继续往下执行。\n需要说明的是判断预构建的内容是否可用的依据是package.lock.json和部分 vite 配置的内容，具体实现在getDepHash函数中",
+      "line": 143,
+      "selection": {
+        "start": {
+          "line": 133,
+          "character": 3
+        },
+        "end": {
+          "line": 143,
+          "character": 4
+        }
+      }
+    },
+    {
+      "file": "packages/vite/src/node/optimizer/index.ts",
+      "selection": {
+        "start": {
+          "line": 157,
+          "character": 3
+        },
+        "end": {
+          "line": 163,
+          "character": 4
+        }
+      },
+      "description": "预构建 2:\n```js\ndeps: 本次需要进行预构建的依赖\nmissing: 解析出问题的依赖\n```\n\n\n使用 esbuild 解析整个项目，获取本次需要进行预构建的依赖和解析出问题的依赖，分别赋值给deps和missing,其主要执行过程在函数scanImports中（这部分的代码实现过程梳理放在本部分最后）。"
+    },
+    {
+      "file": "packages/vite/src/node/optimizer/index.ts",
+      "description": "正式预构建前的一系列的处理:\n\n1. 如果missing有值，则报错,就是我们在控制台看到的\n```js\nThe following dependencies are imported but could not be resolved.... Are they installed\n```\n2. 把配置项config.optimizeDeps?.include里的依赖加入到deps中,如果处理失败的话也会在控制台报错\n3. 如果deps为空的话，说明不需要预构建，更新预构建内容的 hash 值后直接return\n4. 执行到这说明本次需要进行预构建，在控制台提示本次预构建的依赖,如下图所示\n\n![](https://img-blog.csdnimg.cn/img_convert/fd03402869dd07be095bc59bda14b5d5.png)\n",
+      "line": 183,
+      "selection": {
+        "start": {
+          "line": 171,
+          "character": 3
+        },
+        "end": {
+          "line": 183,
+          "character": 4
+        }
+      }
+    },
+    {
+      "file": "packages/vite/src/node/optimizer/index.ts",
+      "description": "正式预构建前的一系列的处理:\n\n1. 如果missing有值，则报错,就是我们在控制台看到的\n```js\nThe following dependencies are imported but could not be resolved.... Are they installed\n```\n2. 把配置项config.optimizeDeps?.include里的依赖加入到deps中,如果处理失败的话也会在控制台报错\n3. 如果deps为空的话，说明不需要预构建，更新预构建内容的 hash 值后直接return\n4. 执行到这说明本次需要进行预构建，在控制台提示本次预构建的依赖,如下图所示\n\n![](https://img-blog.csdnimg.cn/img_convert/fd03402869dd07be095bc59bda14b5d5.png)\n",
+      "line": 211
+    },
+    {
+      "file": "packages/vite/src/node/optimizer/index.ts",
+      "description": "进一步处理deps得到flatIdDeps，主要是因为默认 esbuild 打包的话对于依赖的分析、映射的处理可能比较麻烦,这里主要做了两方面的工作\n\n- 扁平化目录结构。举个例子，引入lib-flexible/flexible,而预构建的依赖为lib-flexible_flexible.js\n![](https://img-blog.csdnimg.cn/img_convert/406bdeaa8758f159a52a97e37ce14d25.png)\n\n- 在插件中，把入口文件当作虚拟文件(这一步应该是 esbuild 插件的需要，不是特别理解)\n",
+      "line": 236
+    },
+    {
+      "file": "packages/vite/src/node/optimizer/index.ts",
+      "description": "使用 esbuild 对deps每个依赖进行构建并默认输出到node_modules/.vite中",
+      "selection": {
+        "start": {
+          "line": 292,
+          "character": 3
+        },
+        "end": {
+          "line": 311,
+          "character": 5
+        }
+      }
+    },
+    {
+      "file": "packages/vite/src/node/optimizer/index.ts",
+      "description": "把此次预构建的信息更新并写入文件node_modules/.vite/_metadata.json,完成预构建！",
+      "line": 332,
+      "selection": {
+        "start": {
+          "line": 318,
+          "character": 1
+        },
+        "end": {
+          "line": 332,
+          "character": 53
+        }
+      }
+    },
+    {
+      "file": "packages/vite/src/node/optimizer/index.ts",
+      "description": "”具体哪些依赖是需要预构建的？“是函数scanImports处理的，在src/node/optimizer/scan.ts中",
+      "line": 159,
+      "selection": {
+        "start": {
+          "line": 159,
+          "character": 33
+        },
+        "end": {
+          "line": 159,
+          "character": 44
+        }
+      }
+    },
+    {
+      "file": "packages/vite/src/node/optimizer/scan.ts",
+      "description": "## scanImports\n\"具体哪些依赖是需要预构建的？\" 是函数scanImports处理的，在src/node/optimizer/scan.ts中，其过程比较简单，大概分为两步：\n\n1. 找到入口文件（一般是index.html）\n2. 使用 esbuild 进行一次打包，打包过程中就找到了deps和missing,最后返回deps和missing\n",
+      "line": 131
+    },
+    {
+      "file": "packages/vite/src/node/optimizer/scan.ts",
+      "description": "## scanImports(1)\n1. 找到入口文件（一般是index.html）",
+      "line": 78,
+      "selection": {
+        "start": {
+          "line": 57,
+          "character": 3
+        },
+        "end": {
+          "line": 77,
+          "character": 4
+        }
+      }
+    },
+    {
+      "file": "packages/vite/src/node/optimizer/scan.ts",
+      "description": "## scanImports(2)\n2. 使用 esbuild 进行一次打包，打包过程中就找到了deps和missing,最后返回deps和missing",
+      "line": 105
+    },
+    {
+      "file": "packages/vite/src/node/optimizer/scan.ts",
+      "description": "## scanImports(3)\n\n由上可以看出，deps和missing是在 esbuild 插件esbuildScanPlugin中得到的，那么这个插件是怎么做的呢？-> esbuildScanPlugin",
+      "line": 106,
+      "selection": {
+        "start": {
+          "line": 128,
+          "character": 5
+        },
+        "end": {
+          "line": 128,
+          "character": 9
+        }
+      }
+    },
+    {
+      "file": "packages/vite/src/node/optimizer/scan.ts",
+      "description": "## esbuildScanPlugin\n模块（依赖）是否放在deps、missing里、放的话放在哪一个都是由函数resolve决定的，从代码中可以看到resolve的执行逻辑如下:\n\n执行 rollup 的 hook resolveId(),\n执行 vite 的插件 pluginContainer resolveId()\n最后是这里的resolve()\n由于我对于这一段的处理逻辑不是很清楚，这里只能简单的理解为：\nresolve失败的话就会放到missing\nresolve里包含node_modules(我理解为放在node_modules目录下)或者在 vite 的配置项include里且是OPTIMIZABLE_ENTRY_RE的会直接放进deps等待打包，不再进一步向下 crawling。\n这里就把预构建需要的deps和missing收集到了。\n",
+      "line": 176,
+      "selection": {
+        "start": {
+          "line": 163,
+          "character": 3
+        },
+        "end": {
+          "line": 175,
+          "character": 4
+        }
+      }
+    },
+    {
+      "file": "packages/vite/src/node/optimizer/scan.ts",
+      "description": "buildInput: '/Users/lambert/Downloads/vite/vite-debug/index.html'\n\nentries =  ['/Users/lambert/Downloads/vite/vite-debug/index.html']\n",
+      "line": 61,
+      "selection": {
+        "start": {
+          "line": 59,
+          "character": 9
+        },
+        "end": {
+          "line": 59,
+          "character": 30
+        }
+      }
+    },
+    {
+      "file": "packages/vite/src/node/optimizer/index.ts",
+      "description": "向业务项目的 /node_modules/.vite/package.json 中写入：\n\n```json\n{\n  \"type\":\"module\"\n}\n```",
+      "line": 155
+    },
+    {
+      "file": "packages/vite/src/node/cli.ts",
+      "description": "主要关注这里，即 vite 这个命令本身对应了这个 action",
+      "line": 79
+    },
+    {
+      "file": "packages/vite/src/node/server/index.ts",
+      "description": "https://github.com/nodejs/node/blob/e46c680bf2b211bbd52cf959ca17ee98c7f657f5/lib/internal/net.js#L31",
+      "line": 8
+    },
+    {
+      "file": "packages/vite/src/node/plugins/html.ts",
+      "description": "traverseHtml",
+      "line": 126,
+      "selection": {
+        "start": {
+          "line": 108,
+          "character": 33
+        },
+        "end": {
+          "line": 108,
+          "character": 58
+        }
+      }
+    }
+  ],
+  "ref": "learn"
+}
